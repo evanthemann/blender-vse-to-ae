@@ -16,7 +16,7 @@ if (typeof JSON !== 'object') { JSON = {}; }
 }());
 
 /* ---------------- CONFIG ---------------- */
-var jsonPath = "/Users/evanmann/blender_vse_to_ae_comp/vse_export.json";
+var jsonPath = "/path/to/vse_export.json";
 var compName = "Blender_VSE";
 /* ---------------------------------------- */
 

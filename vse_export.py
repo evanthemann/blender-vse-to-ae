@@ -4,7 +4,7 @@ Blender VSE → JSON timeline export
 import bpy, json, os, math
 
 # ========= CONFIG =========
-output_path = "/Users/evanmann/blender_vse_to_ae_comp/vse_export.json"
+output_path = "/path/to/vse_export.json"
 # ==========================
 
 scene = bpy.context.scene
