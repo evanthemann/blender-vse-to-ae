@@ -54,6 +54,16 @@ if (clips.length === 0) {
 var proj = app.project || app.newProject();
 var comp  = proj.items.addComp(compName, compW, compH, 1.0, compDuration, fps);
 
+/* ------------ SORT CLIPS FIRST ----------- */
+// Channel: lowest first (bottom), highest last (top)
+// Timeline: earliest first
+clips.sort(function(a, b) {
+    if (a.channel !== b.channel) {
+        return a.channel - b.channel;
+    }
+    return a.timeline_start - b.timeline_start;
+});
+
 /* ------------- IMPORT & PLACE ----------- */
 app.beginUndoGroup("Import Blender Timeline");
 

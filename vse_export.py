@@ -44,7 +44,8 @@ for s in scene.sequence_editor.sequences_all:
         "filepath": bpy.path.abspath(s.filepath),
         "timeline_start": round(timeline_start_s, 3),
         "in_point": round(in_point_s, 3),
-        "out_point": round(out_point_s, 3)
+        "out_point": round(out_point_s, 3),
+        "channel": s.channel  # Track number
     })
 
 export_data = {
