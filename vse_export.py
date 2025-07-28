@@ -45,7 +45,12 @@ for s in scene.sequence_editor.sequences_all:
         "timeline_start": round(timeline_start_s, 3),
         "in_point": round(in_point_s, 3),
         "out_point": round(out_point_s, 3),
-        "channel": s.channel  # Track number
+        "channel": s.channel,  # Track number
+        # Add transform properties if they exist
+        "scale_x": getattr(s.transform, "scale_x", 1.0),
+        "scale_y": getattr(s.transform, "scale_y", 1.0),
+        "translate_x": getattr(s.transform, "offset_x", 0.0),
+        "translate_y": getattr(s.transform, "offset_y", 0.0)
     })
 
 export_data = {

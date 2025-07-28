@@ -83,6 +83,21 @@ for (var i = 0; i < clips.length; i++) {
     var outPoint      = c.out_point;        // seconds
     var duration      = outPoint - inPoint; // seconds
 
+    // --- Scale ---
+    var scaleX = (c.scale_x || 1.0) * 100; // AE scale is in %
+    var scaleY = (c.scale_y || 1.0) * 100;
+    layer.property("Scale").setValue([scaleX, scaleY]);
+
+    // --- Position ---
+    var translateX = c.translate_x || 0.0;
+    var translateY = c.translate_y || 0.0;
+
+    // Blender’s VSE origin is bottom-left, AE’s is center. Adjust accordingly.
+    var pos = layer.property("Position").value;
+    pos[0] += translateX; 
+    pos[1] -= translateY;  // Flip Y axis
+    layer.property("Position").setValue(pos);
+
     layer.startTime = timelineStart - inPoint;
     layer.inPoint   = timelineStart;
     layer.outPoint  = timelineStart + duration;
