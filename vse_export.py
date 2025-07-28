@@ -1,20 +1,26 @@
 """
 Blender VSE → JSON timeline export
 """
-import bpy, json, os, math
-
-# ========= CONFIG =========
-output_path = "/path/to/vse_export.json"
-# ==========================
+import bpy, json, os
 
 scene = bpy.context.scene
-fps = scene.render.fps / scene.render.fps_base     # true FPS (handles 23.976)
-width  = scene.render.resolution_x
+fps = scene.render.fps / scene.render.fps_base
+width = scene.render.resolution_x
 height = scene.render.resolution_y
 
 # Ensure VSE exists
 if not scene.sequence_editor:
     bpy.ops.sequencer.sequencer_toggle()
+
+# Dynamically set export path based on .blend file
+blend_path = bpy.data.filepath
+if not blend_path:
+    print("❌ Please save the .blend file before running.")
+    exit(1)
+
+blend_dir = os.path.dirname(blend_path)
+blend_name = os.path.splitext(os.path.basename(blend_path))[0]
+output_path = os.path.join(blend_dir, f"{blend_name}_vse_export.json")
 
 clips_json = []
 max_out_sec = 0.0
@@ -23,17 +29,14 @@ for s in scene.sequence_editor.sequences_all:
     if s.type != 'MOVIE':
         continue
 
-    # -------- raw frame values --------
-    frame_start        = s.frame_start
-    offset_start       = s.frame_offset_start
-    duration           = s.frame_final_duration
+    frame_start = s.frame_start
+    offset_start = s.frame_offset_start
+    duration = s.frame_final_duration
 
-    # -------- convert to seconds --------
-    timeline_start_s   = (frame_start + offset_start) / fps
-    in_point_s         = offset_start / fps
-    out_point_s        = (offset_start + duration) / fps
+    timeline_start_s = (frame_start + offset_start) / fps
+    in_point_s = offset_start / fps
+    out_point_s = (offset_start + duration) / fps
 
-    # Track comp duration
     max_out_sec = max(max_out_sec, timeline_start_s + (out_point_s - in_point_s))
 
     clips_json.append({
@@ -44,7 +47,6 @@ for s in scene.sequence_editor.sequences_all:
         "out_point": round(out_point_s, 3)
     })
 
-# -------- assemble full JSON --------
 export_data = {
     "fps": round(fps, 3),
     "comp_width": width,
@@ -53,7 +55,6 @@ export_data = {
     "clips": clips_json
 }
 
-# -------- write file --------
 try:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(export_data, f, indent=4)

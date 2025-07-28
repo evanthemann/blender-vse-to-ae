@@ -6,7 +6,6 @@ if (typeof JSON !== 'object') { JSON = {}; }
 (function () {
     if (typeof JSON.parse !== 'function') {
         JSON.parse = function (text) {
-            /* very small and safe for AE */
             text = String(text);
             var cx = /[\u0000-\u001F\u007F-\u009F]/g;
             if (cx.test(text)) { text = text.replace(cx, ''); }
@@ -15,8 +14,15 @@ if (typeof JSON !== 'object') { JSON = {}; }
     }
 }());
 
+/* ---------------- ASK FOR JSON FILE ---------------- */
+var jsonFile = File.openDialog("Select the VSE export JSON", "*.json");
+if (!jsonFile) {
+    alert("❌ No file selected. Exiting.");
+    throw new Error("User cancelled");
+}
+var jsonPath = jsonFile.fsName;
+
 /* ---------------- CONFIG ---------------- */
-var jsonPath = "/path/to/vse_export.json";
 var compName = "Blender_VSE";
 /* ---------------------------------------- */
 
@@ -31,6 +37,7 @@ var jsonStr = f.read();
 f.close();
 
 var data = JSON.parse(jsonStr);     // now safe even in old AE
+
 /* --------- GLOBAL PROJECT INFO ---------- */
 var fps          = data.fps || 30;
 var compW        = data.comp_width  || 1920;
@@ -66,10 +73,6 @@ for (var i = 0; i < clips.length; i++) {
     var outPoint      = c.out_point;        // seconds
     var duration      = outPoint - inPoint; // seconds
 
-    /*  Key alignment logic:
-        - Move footage so that its internal 'inPoint' lines up
-          with the desired timelineStart.
-        - Then set layer's visible range.            */
     layer.startTime = timelineStart - inPoint;
     layer.inPoint   = timelineStart;
     layer.outPoint  = timelineStart + duration;
